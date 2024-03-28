@@ -5,17 +5,15 @@ project(MyProject)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Add the GLFW directory
+# Add glfw
 add_subdirectory(external/glfw)
+include_directories(external/glfw/include)
 
-# Include directories for GLFW and the header-only GLAD
-include_directories(
-    external/glfw/include
-    external/glfw/deps
-)
+# Include glad header files
+include_directories(external/glad/include) # Adjust path if needed
 
-# Define the executable with just main.cpp
-add_executable(MyExecutable src/main.cpp)
+# Add your executable with glad.c
+add_executable(MyExecutable src/main.cpp external/glad/src/glad.c) # Adjust glad.c path if needed
 
-# Link GLFW with your application
+# Linking
 target_link_libraries(MyExecutable glfw)
