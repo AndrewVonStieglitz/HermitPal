@@ -13,7 +13,6 @@ include_directories(${SDL2_INCLUDE_DIRS} external/SDL/include)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-
 add_subdirectory(external/glfw)
 
 # GLAD
