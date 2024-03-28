@@ -2,7 +2,3 @@
 	path = external/SDL
 	url = https://github.com/libsdl-org/SDL.git
 	branch = release-2.30.x
-[submodule "external/glfw"]
-	path = external/glfw
-	url = https://github.com/glfw/glfw.git
-	branch = 3.3-stable
