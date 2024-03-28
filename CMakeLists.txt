@@ -1,25 +1,23 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(MySDLProject)
+project(MyProject)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Add the SDL subdirectory
+# SDL
 add_subdirectory(external/SDL)
-
-# Include directories for SDL
 include_directories(${SDL2_INCLUDE_DIRS} external/SDL/include)
 
-# Add the GLFW subdirectory
+# GLFW
+set(GLFW_BUILD_SHARED_LIBS OFF)
 add_subdirectory(external/glfw)
 
-# Create your executable
-add_executable(MySDLApp src/main.cpp)
+# GLAD
+add_library(glad STATIC external/glad/src/glad.c)
+target_include_directories(glad PUBLIC external/glad/include)
 
-# Link libraries to your executable
-# Link both SDL and GLFW libraries
-target_link_libraries(MySDLApp SDL2main SDL2 glfw)
+add_executable(MyExe src/main.cpp)
 
-# Note: No need to manually include directories for GLFW when using add_subdirectory,
-# as it will handle include paths for targets automatically.
+# Linking SDL, GLFW, and GLAD to the executable
+target_link_libraries(MyExe SDL2main SDL2 glfw glad)
