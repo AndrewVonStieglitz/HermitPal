@@ -1,61 +1,97 @@
-#include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <stdio.h>
+
+const GLchar* vertexSource =
+    "#version 150 core\n"
+    "in vec2 position;"
+    "void main() {"
+    "   gl_Position = vec4(position, 0.0, 1.0);"
+    "}";
+
+const GLchar* fragmentSource =
+    "#version 150 core\n"
+    "out vec4 outColor;"
+    "void main() {"
+    "   outColor = vec4(1.0, 1.0, 1.0, 1.0);" // White color
+    "}";
+
 
 int main(int argc, char* argv[]) {
-    // Initialize GLFW
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW\n";
+    // Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
         return -1;
     }
 
-    // Create a GLFW window
-    GLFWwindow* window = glfwCreateWindow(800, 600, "GLFW Window with SDL Input", nullptr, nullptr);
+    // Set OpenGL attributes
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    // Create the window
+    SDL_Window* window = SDL_CreateWindow("Hello Triangle",
+                                          SDL_WINDOWPOS_CENTERED,
+                                          SDL_WINDOWPOS_CENTERED,
+                                          800,
+                                          600,
+                                          SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-
-    // Initialize GLAD
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize GLAD\n";
+        SDL_Log("Failed to create window: %s", SDL_GetError());
+        SDL_Quit();
         return -1;
     }
 
-    // Initialize SDL for event handling
-    if (SDL_Init(SDL_INIT_EVENTS) != 0) {
-        std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << "\n";
+    // Create OpenGL context
+    SDL_GLContext glContext = SDL_GL_CreateContext(window);
+    if (!glContext) {
+        SDL_Log("Failed to create OpenGL context: %s", SDL_GetError());
+        SDL_DestroyWindow(window);
+        SDL_Quit();
         return -1;
     }
 
-    // Main loop
-    while (!glfwWindowShouldClose(window)) {
-        // Poll and handle events (inputs, window close, etc.)
-        SDL_Event e;
-        while (SDL_PollEvent(&e)) {
+    // Initialize OpenGL loader here (e.g., glad, glew)
+    // For example, using glad: if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
+    //     SDL_Log("Failed to initialize the OpenGL context.");
+    //     SDL_GL_DeleteContext(glContext);
+    //     SDL_DestroyWindow(window);
+    //     SDL_Quit();
+    //     return -1;
+    // }
+
+    // Set viewport
+    glViewport(0, 0, 800, 600);
+
+    // Main loop flag
+    bool quit = false;
+
+    // Event handler
+    SDL_Event e;
+
+    while (!quit) {
+        // Handle events on queue
+        while (SDL_PollEvent(&e) != 0) {
+            // User requests quit
             if (e.type == SDL_QUIT) {
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
-            } else if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_LEFT) {
-                    std::cout << "Left arrow key was pressed." << std::endl;
-                }
+                quit = true;
             }
-            // Handle other SDL events here
         }
 
-        // OpenGL rendering commands
+        // Clear the screen
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        // ...render with OpenGL...
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        // Render OpenGL stuff here
+
+        // Swap the screen buffer
+        SDL_GL_SwapWindow(window);
     }
 
+    //Destroy window
+    SDL_GL_DeleteContext(glContext);
+    SDL_DestroyWindow(window);
     SDL_Quit();
-    glfwDestroyWindow(window);
-    glfwTerminate();
 
     return 0;
 }
